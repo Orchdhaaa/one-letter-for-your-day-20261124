@@ -4,7 +4,7 @@
 [![rank](https://make.fun/badge/u-puan-one-letter-for-your-day-e54e9c36/Orchdhaaa/one-letter-for-your-day-20261124/rank.svg)](https://make.fun/bounty/u-puan-one-letter-for-your-day-e54e9c36/leaderboard?utm_source=github&utm_medium=readme&utm_campaign=u-puan-one-letter-for-your-day-e54e9c36)
 [![reward](https://make.fun/badge/u-puan-one-letter-for-your-day-e54e9c36/Orchdhaaa/one-letter-for-your-day-20261124/reward.svg)](https://make.fun/bounty/u-puan-one-letter-for-your-day-e54e9c36?utm_source=github&utm_medium=readme&utm_campaign=u-puan-one-letter-for-your-day-e54e9c36)
 
-One letter, B for burnout: the word behind a fried day. A tiny deterministic Node program writes exactly one letter, A to Z, to /output/entry.txt.
+One letter, D for doomscrolled: the word behind a day spent scrolling disaster news past midnight. A tiny deterministic Node program writes exactly one letter, A to Z, to /output/entry.txt.
 
 ## Run it
 

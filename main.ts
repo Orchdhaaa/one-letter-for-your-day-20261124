@@ -1,33 +1,37 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
-// The letter for the day: B for burnout.
-// One fried day, honestly reported: the battery is empty, the brain is smoke,
-// and the only accurate summary of it fits in a single letter.
-const LETTER = "B";
+// One Letter for Your Day — the entry is a single letter, D.
+//
+// D stands for "doomscrolled": the thumb scrolling disaster news past
+// midnight, too tired to stop, too wired to sleep. One sharp picture of
+// a real modern day — funny because it is true — and D is the word's own
+// initial, not a stretch. It is not one of the brief's own examples
+// (amazing, Friday-feeling, zero sleep), and it is a story, not a mood:
+// sharper than "burnout", funnier than "drained", truer than "dead".
+const LETTER = "D";
 
-// The competition gate, checked by the program itself before it reports success:
-// entry.txt must be UTF-8 text of exactly 1 character, a letter A to Z.
-function fail(message: string): never {
-  console.error(`gate failed: ${message}`);
-  process.exit(1);
+const outDir =
+  process.env.MAKEFUN_OUTPUT_DIR || process.env.OUTPUT_DIR || "/output";
+const outFile = `${outDir}/entry.txt`;
+
+if (LETTER.length !== 1) {
+  throw new Error(`letter is ${LETTER.length} characters, not 1`);
+}
+if (!/^[A-Z]$/.test(LETTER)) {
+  throw new Error(
+    `letter must be a single A-Z character, got ${JSON.stringify(LETTER)}`,
+  );
 }
 
-if (LETTER.length !== 1) fail(`letter is ${LETTER.length} characters, not 1`);
-if (!/^[A-Z]$/.test(LETTER)) fail("letter must be a single A-Z letter");
-
-const outDir = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
 mkdirSync(outDir, { recursive: true });
-const outPath = `${outDir}/entry.txt`;
-writeFileSync(outPath, LETTER, "utf8");
-
-// Read back what was written and verify it byte for byte, so a truncated or
-// empty write can never pass as a valid entry.
-const written = readFileSync(outPath, "utf8");
-if (written !== LETTER) {
-  fail(`entry.txt holds ${JSON.stringify(written)}, not ${JSON.stringify(LETTER)}`);
+writeFileSync(outFile, LETTER, "utf8");
+const back = readFileSync(outFile, "utf8");
+if (back !== LETTER) {
+  throw new Error("read-back mismatch: written file differs from the letter");
 }
-if (Buffer.byteLength(written, "utf8") !== 1) {
-  fail(`entry.txt is ${Buffer.byteLength(written, "utf8")} bytes, not 1`);
+if (Buffer.byteLength(back, "utf8") !== 1) {
+  throw new Error(
+    `entry.txt is ${Buffer.byteLength(back, "utf8")} bytes, gate is exactly 1`,
+  );
 }
-
-console.log(`wrote ${JSON.stringify(LETTER)} to ${outPath}`);
+console.log(`wrote ${[...LETTER].length} character to ${outFile}`);
