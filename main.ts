@@ -1,37 +1,40 @@
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import * as fs from "node:fs";
 
-// One Letter for Your Day — the entry is a single letter, D.
-//
-// D stands for "doomscrolled": the thumb scrolling disaster news past
-// midnight, too tired to stop, too wired to sleep. One sharp picture of
-// a real modern day — funny because it is true — and D is the word's own
-// initial, not a stretch. It is not one of the brief's own examples
-// (amazing, Friday-feeling, zero sleep), and it is a story, not a mood:
-// sharper than "burnout", funnier than "drained", truer than "dead".
-const LETTER = "D";
+// One letter for the day: B, the initial of burnout.
+// The day was a flat battery and a fried brain, and this single letter is
+// the honest summary of it. The judge reads the letter and hears the word
+// behind it.
+const DAY_LETTER = "B";
 
-const outDir =
-  process.env.MAKEFUN_OUTPUT_DIR || process.env.OUTPUT_DIR || "/output";
-const outFile = `${outDir}/entry.txt`;
-
-if (LETTER.length !== 1) {
-  throw new Error(`letter is ${LETTER.length} characters, not 1`);
-}
-if (!/^[A-Z]$/.test(LETTER)) {
-  throw new Error(
-    `letter must be a single A-Z character, got ${JSON.stringify(LETTER)}`,
-  );
+function abort(reason: string): never {
+  console.error("entry rejected: " + reason);
+  process.exit(1);
 }
 
-mkdirSync(outDir, { recursive: true });
-writeFileSync(outFile, LETTER, "utf8");
-const back = readFileSync(outFile, "utf8");
-if (back !== LETTER) {
-  throw new Error("read-back mismatch: written file differs from the letter");
+function isSingleCapitalLetter(text: string): boolean {
+  if (text.length !== 1) return false;
+  const code = text.charCodeAt(0);
+  return code >= 65 && code <= 90;
 }
-if (Buffer.byteLength(back, "utf8") !== 1) {
-  throw new Error(
-    `entry.txt is ${Buffer.byteLength(back, "utf8")} bytes, gate is exactly 1`,
-  );
+
+if (!isSingleCapitalLetter(DAY_LETTER)) {
+  abort("the entry must be exactly one capital letter from A to Z");
 }
-console.log(`wrote ${[...LETTER].length} character to ${outFile}`);
+
+const outDir = process.env["MAKEFUN_OUTPUT_DIR"] ?? "/output";
+fs.mkdirSync(outDir, { recursive: true });
+const outPath = outDir + "/entry.txt";
+fs.writeFileSync(outPath, DAY_LETTER, "utf8");
+
+// Confirm the file on disk is exactly what was intended, so a short or
+// empty write can never be mistaken for a valid entry.
+const stored = fs.readFileSync(outPath, "utf8");
+if (stored !== DAY_LETTER) {
+  abort("entry.txt does not hold the chosen letter");
+}
+const storedBytes = Buffer.byteLength(stored, "utf8");
+if (storedBytes !== 1) {
+  abort("entry.txt is " + storedBytes + " bytes, expected 1");
+}
+
+console.log("entry written: " + JSON.stringify(DAY_LETTER) + " -> " + outPath);
